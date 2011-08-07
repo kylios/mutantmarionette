@@ -85,9 +85,9 @@ class Toad(MToad):
 
     def handle_eat(self):
         if (Grutonium in self.inventory and
-            self.inventory[Grutonium] < self.max_health - self.health and
+            self.inventory[Grutonium] * 2 < self.max_health - self.health and
             self.inventory[Grutonium] > 0):
-            self.eat(Grutonium, self.inventory[Grutonium])
+            self.eat(Grutonium, 1)
             return True
         if Grutonium in self.inventory:
             self.log_error(self.inventory[Grutonium])
@@ -116,6 +116,18 @@ class Toad(MToad):
             x = random.randint(-1000, 1000)
             y = random.randint(-1000, 1000)
             self.direction = (self.pos[0] + x, self.pos[1] + y)
+        elif random.randint(0, 1) == 0:
+                # Calculate a new direction that is similar 
+                # to our current direction
+                dist = self.dist(self.pos, self.direction)
+                opy = math.sin(math.radians(60)) * dist
+                opx = math.cos(math.radians(60)) * dist
+
+                self.log_error("old: %s, new: %s" % (str(self.direction), str((opx,\
+                    opy)) ))
+
+                self.direction = (opx, opy)
+
         self.move(*self.direction)
         return True
 
