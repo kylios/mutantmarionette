@@ -112,22 +112,26 @@ class Toad(MToad):
     def handle_move(self):
         if self.target:
             self.direction = self.target.pos
-        elif self.stuck:
+        elif self.stuck or (self.dist(self.pos, self.last_pos) < self.speed):
             x = random.randint(-1000, 1000)
             y = random.randint(-1000, 1000)
             self.direction = (self.pos[0] + x, self.pos[1] + y)
-        elif random.randint(0, 1) == 0:
-                # Calculate a new direction that is similar 
-                # to our current direction
-                dist = self.dist(self.pos, self.direction)
-                opy = math.sin(math.radians(60)) * dist
-                opx = math.cos(math.radians(60)) * dist
+        elif random.randint(0, 6) == 1:
+#                # Calculate a new direction that is similar 
+#                # to our current direction
+#                dist = self.dist(self.pos, self.direction)
+#                opy = self.pos[1] + math.sin(math.radians(90)) * \
+#                        (dist /2)
+#                opx = self.pos[0] + math.cos(math.radians(90)) * \
+#                        (dist / 2)
+#
+#                self.log_error("old: %s, new: %s" % (str(self.direction), str((opx,\
+#                    opy)) ))
+#
+#                self.direction = (opx, opy)
 
-                self.log_error("old: %s, new: %s" % (str(self.direction), str((opx,\
-                    opy)) ))
-
-                self.direction = (opx, opy)
-
+            self.direction = (self.pos[0] + random.randint(-1000, 1000), \
+                    self.pos[1] + random.randint(-1000, 1000))
         self.move(*self.direction)
         return True
 
