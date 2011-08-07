@@ -78,7 +78,7 @@ class Toad(MToad):
             self.handle_eat,
             self.handle_grab,
             self.handle_move,
-            self.handle_drop,
+            #self.handle_drop,
             #self.handle_die,
         ]
         for h in handle:
