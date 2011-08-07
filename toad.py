@@ -75,6 +75,8 @@ class Toad(MToad):
             
         possible_targets = set(self.items_in_view) - set(bad_targets)
         self.target = min(self.dist_to_items(self.pos, possible_targets))[1]
+        if self.target == None:
+            self.target = min(self.dist_to_items())[1]
 
 
 
