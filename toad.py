@@ -12,17 +12,71 @@ class Toad(MToad):
         self.target = None
         self.time = 0
 
+        self.units = {}
+        self.old_units = {}
+
     def dist(self, pos1, pos2):
         return math.sqrt((pos1[0] - pos2[0])**2 + (pos1[1] - pos2[1])**2)
 
-    def dist_to_items(self):
+    def dist_to_items(self, pos=None, possible_targets=None):
+        if pos == None: pos = self.pos
+        if possible_targets == None: possible_targets = self.items_in_view
         yield float('inf'), None
-        for item in self.items_in_view:
-            yield self.dist(self.pos, item.pos), item
+        for item in possible_targets:
+            yield self.dist(pos, item.pos), item
+
+    def calc_units(self):
+        pass
 
     def calc_target(self):
-        smallest_dist = self.range_of_sight
-        self.target = min(self.dist_to_items())[1]
+
+#        while True:
+#            dist, self.target = min(self.dist_to_items())
+#            self.log_error("dist: %f, target: %s" % (dist, str(self.target)))
+#
+#            # List of objects to NOT target
+#            bad_targets = []
+#
+#            for unit in self.units_in_view:
+#
+#                if unit.pos == self.pos:
+#                    continue
+#                
+#                min_dist = 0
+#                target = None
+#                # Find the unit's nearest target
+#                for t in self.items_in_view:
+#                    d = math.sqrt((unit.pos[0] - t.pos[0])**2 + \
+#                            (unit.pos[1] - t.pos[1])**2)
+#                    if min_dist == 0 or d < min_dist:
+#                        min_dist = d
+#                        target = t
+#                if self.target:
+#                    if self.target.pos == target.pos and min_dist < dist:
+#                        bad_targets.append(target)
+#                else:
+#                    bad_targets.append(target)
+#
+#            if self.target.pos not in (t.pos for t in bad_targets):
+#                break
+#
+
+        bad_targets = []
+        # Calculate all items targeted by other units and their distances to
+        # those items
+        for u in self.units_in_view:
+            dist, target = min(self.dist_to_items(u.pos))
+            if not target:
+                continue
+            my_dist = self.dist(self.pos, target.pos)
+
+            if dist > my_dist:
+                bad_targets.append(target)
+            
+        possible_targets = set(self.items_in_view) - set(bad_targets)
+        self.target = min(self.dist_to_items(self.pos, possible_targets))[1]
+
+
 
     def calc_stuck(self):
         self.stuck = self.pos == self.last_pos
@@ -69,6 +123,7 @@ class Toad(MToad):
     def act(self):
         calc = [
             self.calc_stuck,
+            self.calc_units,
             self.calc_target,
         ]
         for c in calc:
